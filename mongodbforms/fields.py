@@ -7,6 +7,7 @@ Wilson Júnior (wilsonpjunior@gmail.com).
 
 from django import forms
 from django.core.validators import EMPTY_VALUES
+from django.core.validators import RegexValidator
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext_lazy as _
 
@@ -36,6 +37,14 @@ class MongoChoiceIterator(object):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
 
 class MongoCharField(forms.CharField):
+    def __init__(self, *args, **kwargs):
+        regex = kwargs.pop('regex', False)
+        if regex:
+             self.default_validators = [ RegexValidator(regex) ]
+
+        return super(MongoCharField, self).__init__(*args, **kwargs)
+
+
     def to_python(self, value):
         if value in EMPTY_VALUES:
             return None

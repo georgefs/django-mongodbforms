@@ -13,7 +13,7 @@ from django.utils.text import capfirst
 
 from mongoengine import ReferenceField as MongoReferenceField
 
-from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField
+from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, StringListField
 
 BLANK_CHOICE_DASH = [("", "---------")]
 
@@ -238,6 +238,17 @@ class MongoFormFieldGenerator(object):
 
             defaults.update(kwargs)
             f = DocumentMultipleChoiceField(field.field.document_type.objects, **defaults)
+            return f
+        else:
+            defaults = {
+                'label': self.get_field_label(field),
+                'help_text': self.get_field_help_text(field),
+                'required': field.required,
+                'widget': forms.Textarea,
+            }
+
+            defaults.update(kwargs)
+            f = StringListField(**defaults)
             return f
 
     def generate_filefield(self, field, **kwargs):

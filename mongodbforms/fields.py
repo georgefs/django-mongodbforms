@@ -18,6 +18,7 @@ except ImportError:
     from pymongo.objectid import ObjectId
     from pymongo.errors import InvalidId
 
+ 
 class MongoChoiceIterator(object):
     def __init__(self, field):
         self.field = field
@@ -49,6 +50,18 @@ class MongoCharField(forms.CharField):
         if value in EMPTY_VALUES:
             return None
         return smart_unicode(value)
+
+class StringListField(MongoCharField):
+    def prepare_value(self, value):
+        if isinstance(value, type([])):
+            return ','.join(value)
+        else:
+            return 
+ 
+    def to_python(self, value):
+        if not value:
+            return []
+        return [item.strip() for item in value.split(',')]
 
 class ReferenceField(forms.ChoiceField):
     """
